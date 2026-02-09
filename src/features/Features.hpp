@@ -3,3 +3,4 @@
 
 void RegisterCameraHooks();
 void RegisterPlayerRendererHooks();
+void RegisterOptionsFovHooks();

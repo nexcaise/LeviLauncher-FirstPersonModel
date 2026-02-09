@@ -14,6 +14,7 @@ void FirstPersonModel_Init() {
     // Create initialization thread
     RegisterPlayerRendererHooks();
     RegisterCameraHooks();
+    RegisterOptionsFovHooks();
 }
 
 // Destructor function - runs when library is unloaded
