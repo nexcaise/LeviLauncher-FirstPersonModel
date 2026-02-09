@@ -28,35 +28,19 @@ add_compile_options(
 add_definitions(-DANDROID -DFIRSTPERSONMODEL_EXPORTS)
 
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/hook
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 set(SOURCES
-    src/FirstPersonModel.cpp
-    src/ModMain.cpp
-    src/CameraHooks.cpp
-    src/PlayerRenderer.cpp
-    src/hook/HookManager.cpp
-    src/hook/ARMPatch.cpp
-    src/hook/KittyMemory.cpp
-    src/hook/KittyUtils.cpp
-    src/hook/KittyScanner.cpp
-    src/hook/KittyArm64.cpp
+    src/features/Features.cpp
+    src/main.cpp
+    src/util/Hooks.cpp
 )
 
 set(HEADERS
-    src/include/FirstPersonModel.h
-    src/include/CameraAPI.h
-    src/include/Signatures.h
-    src/include/Offsets.h
-    src/include/Logger.h
-    src/hook/HookManager.h
-    src/hook/KittyMemory.h
-    src/hook/KittyUtils.h
-    src/hook/KittyScanner.h
-    src/hook/KittyArm64.h
-    src/hook/ARMPatch.h
+    src/util/Hooks.hpp
+    src/util/Logger.h
+    src/features/Features.hpp
 )
 
 add_library(FirstPersonModel SHARED ${SOURCES} ${HEADERS})
