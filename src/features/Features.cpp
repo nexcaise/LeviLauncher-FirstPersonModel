@@ -41,7 +41,7 @@ float m_modelScale = 1.0f;
 
 void* m_cameraPtr = nullptr;
 
-IOtions* opt = nullptr;
+IOptions* opt = nullptr;
 
 GetFovFunc g_optionsGetFov = nullptr;
 CameraRenderOriginal g_cameraRenderOriginal = nullptr;
