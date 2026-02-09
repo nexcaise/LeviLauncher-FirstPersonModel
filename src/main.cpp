@@ -5,6 +5,27 @@
 #include "pl/Hook.h"
 #include "pl/Gloss.h"
 
+#include "util/IOptions.h"
+#include "util/IntOption.h"
+#include "util/OptionID.h"
+
+bool inited = false;
+
+using GetFovFunc = float(*)(IOptions* options, float defaultFov);
+
+GetFovFunc orig_OptionsgetFov = nullptr;
+float hook_OptionsgetFov(IOptions* opt, float df) {
+
+    if(!inited) {
+        auto& abc = opt->getAllRegisteredOptions();
+        IntOption* view = (IntOption*)abc[(int)OptionID::ViewDistance].get(); 
+        view->mValue = 2;
+        inited = true;
+    }
+
+    return orig_OptionsgetFov ? orig_OptionsgetFov(opt, df) : nullptr;
+}
+
 constexpr uintptr_t CAMERA_POS_OFFSET = 0x18;
 
 static float g_CameraOffsetX = 0.0f;
@@ -71,8 +92,13 @@ __attribute__((constructor))
 static void FirstPersonModel_Init() {
     GlossInit(true);
     Hook(
-        "48 ?? ?? ?? 21 ?? ?? 91 ?? ?? 00 ?? ?? 91 ?? ?? 40 ?? ?? 00 00 ?? ?? 00 94",
+        "48 ? ? ? 21 ? ? 91 ? ? 00 ? ? 91 ? ? 40 ? ? 00 00 ? ? 00 94",
         (void*)hook_CameraRender,
         (void**)&orig_CameraRender
+    );
+    HOOK(
+        "FD 7B ? A9 F4 4F ? A9 FD 03 00 91 08 ?? 40 ? ? ? 00 ? ? 00 00 ? ? ? 00 94"
+        (void*)hook_OptionsgetFov,
+        (void**)&orig_OptionsgetFov
     );
 }
