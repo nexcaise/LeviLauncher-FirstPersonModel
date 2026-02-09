@@ -27,37 +27,36 @@ add_compile_options(
 
 add_definitions(-DANDROID -DFIRSTPERSONMODEL_EXPORTS)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/hook
-    ${CMAKE_CURRENT_SOURCE_DIR}/patch
+src/include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/hook
 )
 
 set(SOURCES
     src/FirstPersonModel.cpp
     src/ModMain.cpp
-    src/CameraHooks.cpp
+    src/Camerasrc/hooks.cpp
     src/PlayerRenderer.cpp
-    hook/HookManager.cpp
-    hook/ARMPatch.cpp
-    hook/KittyMemory.cpp
-    hook/KittyUtils.cpp
-    hook/KittyScanner.cpp
-    hook/KittyArm64.cpp
+    src/hook/src/hookManager.cpp
+    src/hook/ARMPatch.cpp
+    src/hook/KittyMemory.cpp
+    src/hook/KittyUtils.cpp
+    src/hook/KittyScanner.cpp
+    src/hook/KittyArm64.cpp
 )
 
 set(HEADERS
-    include/FirstPersonModel.h
-    include/CameraAPI.h
-    include/Signatures.h
-    include/Offsets.h
-    include/Logger.h
-    hook/HookManager.h
-    hook/KittyMemory.h
-    hook/KittyUtils.h
-    hook/KittyScanner.h
-    hook/KittyArm64.h
-    hook/ARMPatch.h
+    src/include/FirstPersonModel.h
+    src/include/CameraAPI.h
+    src/include/Signatures.h
+    src/include/Offsets.h
+    src/include/Logger.h
+    src/hook/src/hookManager.h
+    src/hook/KittyMemory.h
+    src/hook/KittyUtils.h
+    src/hook/KittyScanner.h
+    src/hook/KittyArm64.h
+    src/hook/ARMPatch.h
 )
 
 add_library(FirstPersonModel SHARED ${SOURCES} ${HEADERS})
