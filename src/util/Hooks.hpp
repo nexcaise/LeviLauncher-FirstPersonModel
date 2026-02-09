@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
 
-#include <pl/Signature.h>
-#include <pl/Hook.h>
+#include "pl/Signature.h"
+#include "pl/Hook.h"
 #include "util/Logger.h"
 
 #include <fstream>
