@@ -49,7 +49,6 @@ set(SOURCES
 set(HEADERS
     include/FirstPersonModel.h
     include/CameraAPI.h
-    include/ICameraAPI.h
     include/Signatures.h
     include/Offsets.h
     include/Logger.h
