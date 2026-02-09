@@ -41,6 +41,8 @@ float m_modelScale = 1.0f;
 
 void* m_cameraPtr = nullptr;
 
+IOtions* opt = nullptr;
+
 GetFovFunc g_optionsGetFov = nullptr;
 CameraRenderOriginal g_cameraRenderOriginal = nullptr;
 CameraIsFirstPersonOriginal g_cameraIsFirstPersonOriginal = nullptr;
@@ -73,7 +75,7 @@ float hookedOptionsGetFov(IOptions* options, float defaultFov) {
     FloatOption* gamma = (FloatOption*)abc[(int)OptionID::Gamma].get(); 
     IntOption* view = (IntOption*)abc[(int)OptionID::ViewDistance].get(); 
     view->mValue = 2;
-    gamma->mValue = 10000.10000.0f;
+    gamma->mValue = 10000.0f;
     inited = true;
     }
     
