@@ -40,8 +40,8 @@ target_link_libraries(preloader PUBLIC fmt::fmt)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/include
-    ${CMAKE_SOURCE_DIR}/src/hook
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/hook
 )
 
 set(SOURCES
