@@ -27,7 +27,7 @@ add_compile_options(
 
 add_definitions(-DANDROID -DFIRSTPERSONMODEL_EXPORTS)
 
-src/include_directories(
+include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hook
 )
@@ -35,9 +35,9 @@ src/include_directories(
 set(SOURCES
     src/FirstPersonModel.cpp
     src/ModMain.cpp
-    src/Camerasrc/hooks.cpp
+    src/CameraHooks.cpp
     src/PlayerRenderer.cpp
-    src/hook/src/hookManager.cpp
+    src/hook/HookManager.cpp
     src/hook/ARMPatch.cpp
     src/hook/KittyMemory.cpp
     src/hook/KittyUtils.cpp
@@ -51,7 +51,7 @@ set(HEADERS
     src/include/Signatures.h
     src/include/Offsets.h
     src/include/Logger.h
-    src/hook/src/hookManager.h
+    src/hook/HookManager.h
     src/hook/KittyMemory.h
     src/hook/KittyUtils.h
     src/hook/KittyScanner.h
