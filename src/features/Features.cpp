@@ -3,6 +3,10 @@
 #include <dlfcn.h>
 #include <cstdint>
 #include <cmath>
+#include "util/IOptions.hpp"
+#include "util/IntOption.h"
+#include "util/FloatOption.h"
+#include "util/OptionID.h"
 
 struct Vec3 {
     float x, y, z;
@@ -24,8 +28,10 @@ struct Vec2 {
 using CameraRenderOriginal = void(*)(void*, void*);
 using CameraIsFirstPersonOriginal = bool(*)(void*);
 using PlayerRenderOriginal = void(*)(void*, void*, void*);
+using GetFovFunc = float(*)(IOptions* options, float defaultFov);
 
 void onCameraRender();
+bool inited = false;
 bool isFirstPerson();
 bool shouldRenderModelInFirstPerson();
 
@@ -35,6 +41,7 @@ float m_modelScale = 1.0f;
 
 void* m_cameraPtr = nullptr;
 
+GetFovFunc g_optionsGetFov = nullptr;
 CameraRenderOriginal g_cameraRenderOriginal = nullptr;
 CameraIsFirstPersonOriginal g_cameraIsFirstPersonOriginal = nullptr;
 PlayerRenderOriginal g_playerRenderOriginal = nullptr;
@@ -56,6 +63,21 @@ bool hookedCameraIsFirstPerson(void* camera) {
         return false;
 
     return g_cameraIsFirstPersonOriginal(camera);
+}
+
+float hookedOptionsGetFov(IOptions* options, float defaultFov) {
+    if(opt == nullptr) opt = options;
+    
+    if(!inited) {
+    auto& abc = opt->getAllRegisteredOptions();
+    FloatOption* gamma = (FloatOption*)abc[(int)OptionID::Gamma].get(); 
+    IntOption* view = (IntOption*)abc[(int)OptionID::ViewDistance].get(); 
+    view->mValue = 2;
+    gamma->mValue = 10000.10000.0f;
+    inited = true;
+    }
+    
+    return g_optionsGetFov(options, defaultFov);
 }
 
 void hookedPlayerRender(void* player, void* renderParams, void* matrix) {
@@ -144,7 +166,7 @@ void RegisterCameraHooks() {
 void RegisterPlayerRendererHooks() {
     HOOK("FF 03 04 D1 FD 7B 0C A9 FA 67 0D A9 F8 5F 0E A9 F6 57 0F A9 F4 4F 10 A9", (void*)hookedPlayerRender, (void**)&g_playerRenderOriginal);
 }
-/*
+
 void RegisterOptionsFovHooks() {
-    HOOK(addr,(void*)hookedOptionsGetFov
-}*/
+    HOOK("FD 7B ?? A9 F4 4F ?? A9 FD 03 00 91 08 ?? 40 ?? ?? ?? 00 ?? ?? 00 00 ?? ?? ?? 00 94",(void*)hookedOptionsGetFov, (void**)&g_optionsGetFov);
+}
