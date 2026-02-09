@@ -1,34 +1,45 @@
 cmake_minimum_required(VERSION 3.18)
-project(FirstPersonModel VERSION 1.0.0 LANGUAGES CXX C)
+project(FirstPersonModel LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT ANDROID)
-    message(FATAL_ERROR "This mod is designed for Android only (LeviLaunchroid)")
+# Optimization flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fvisibility=hidden -ffunction-sections -fdata-sections -fexceptions -w")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -fvisibility=hidden -ffunction-sections -fdata-sections -w")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections,--strip-all -s")
+
+include(FetchContent)
+
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 10.2.1
+)
+FetchContent_MakeAvailable(fmt)
+
+FetchContent_Declare(
+    preloader_android
+    GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
+    GIT_TAG main
+)
+FetchContent_GetProperties(preloader_android)
+if(NOT preloader_android_POPULATED)
+    FetchContent_Populate(preloader_android)
+    
+    file(READ "${preloader_android_SOURCE_DIR}/src/pl/Logger.h" LOGGER_CONTENT)
+    string(REPLACE "#include <format>" "#include <fmt/format.h>" LOGGER_CONTENT "${LOGGER_CONTENT}")
+    string(REPLACE "std::vformat" "fmt::vformat" LOGGER_CONTENT "${LOGGER_CONTENT}")
+    string(REPLACE "std::make_format_args" "fmt::make_format_args" LOGGER_CONTENT "${LOGGER_CONTENT}")
+    file(WRITE "${preloader_android_SOURCE_DIR}/src/pl/Logger.h" "${LOGGER_CONTENT}")
+    
+    add_subdirectory(${preloader_android_SOURCE_DIR} ${preloader_android_BINARY_DIR})
 endif()
 
-set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build type" FORCE)
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-add_compile_options(
-    -O2
-    -fvisibility=hidden
-    -fvisibility-inlines-hidden
-    -fno-rtti
-    -fno-exceptions
-    -Wall
-    -Wextra
-    -Wno-unused-parameter
-    -Wno-unused-variable
-)
-
-add_definitions(-DANDROID -DFIRSTPERSONMODEL_EXPORTS)
+target_link_libraries(preloader PUBLIC fmt::fmt)
 
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 set(SOURCES
@@ -37,52 +48,5 @@ set(SOURCES
     src/util/Hooks.cpp
 )
 
-set(HEADERS
-    src/util/Hooks.hpp
-    src/util/Logger.h
-    src/features/Features.hpp
-)
-
-add_library(FirstPersonModel SHARED ${SOURCES} ${HEADERS})
-
-find_library(log-lib log)
-find_library(GLESV2_LIB GLESv2)
-
-if(${CMAKE_ANDROID_ARCH_ABI} STREQUAL "arm64-v8a")
-    target_compile_definitions(FirstPersonModel PRIVATE ARM64)
-    set(ARCH_DIR arm64)
-elseif(${CMAKE_ANDROID_ARCH_ABI} STREQUAL "armeabi-v7a")
-    target_compile_definitions(FirstPersonModel PRIVATE ARMV7)
-    set(ARCH_DIR arm)
-else()
-    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_ANDROID_ARCH_ABI}")
-endif()
-
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/lib/${ARCH_DIR}/libsubstrate.a)
-    set(SUBSTRATE_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/${ARCH_DIR}/libsubstrate.a)
-else()
-    message(WARNING "Substrate library not found. Using inline hooking only.")
-    set(SUBSTRATE_LIB "")
-endif()
-
-target_link_libraries(FirstPersonModel
-    ${log-lib}
-    ${GLESV2_LIB}
-    ${SUBSTRATE_LIB}
-    dl
-)
-
-set_target_properties(FirstPersonModel PROPERTIES
-    CXX_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN ON
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/${CMAKE_ANDROID_ARCH_ABI}
-)
-
-add_custom_command(TARGET FirstPersonModel POST_BUILD
-    COMMAND ${CMAKE_STRIP} $<TARGET_FILE:FirstPersonModel>
-    COMMENT "Stripping symbols from FirstPersonModel.so"
-)
-
-message(STATUS "Building FirstPersonModel for ${CMAKE_ANDROID_ARCH_ABI}")
-message(STATUS "NDK Version: ${CMAKE_ANDROID_NDK_VERSION}")
-message(STATUS "API Level: ${CMAKE_SYSTEM_VERSION}")
+add_library(FirstPersonModel SHARED ${SOURCES})
+target_link_libraries(FirstPersonModel preloader log android EGL GLESv3 GLESv2)
