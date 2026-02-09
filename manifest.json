@@ -1,0 +1,30 @@
+{
+  "format_version": 3,
+  "id": "com.firstpersonmodel.mod",
+  "name": "FirstPersonModel",
+  "version": "1.0.0",
+  "description": "Shows the player model in first person view for Minecraft Bedrock Edition on Android",
+  "author": "FirstPersonModel Team",
+  "license": "MIT",
+  "type": "mod",
+  "client_only": true,
+  "platform": "android",
+  "arch": ["arm64-v8a"],
+  "min_api": 26,
+  "min_android_version": "8.0",
+  "target_minecraft": "1.20+",
+  "dependencies": {},
+  "entry_point": "libFirstPersonModel.so",
+  "features": [
+    "first_person_model",
+    "camera_offset",
+    "no_imgui",
+    "client_side_only"
+  ],
+  "tags": [
+    "visual",
+    "camera",
+    "first-person",
+    "client-side"
+  ]
+}

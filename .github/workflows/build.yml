@@ -1,0 +1,110 @@
+name: Build FirstPersonModel
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: nttld/setup-ndk@v1
+      id: ndk
+      with:
+        ndk-version: r26b
+        
+    - name: Build
+      run: |
+        mkdir build
+        cmake -B build \
+          -DCMAKE_TOOLCHAIN_FILE=${{ steps.ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake \
+          -DANDROID_ABI=arm64-v8a \
+          -DANDROID_PLATFORM=android-24 \
+          -DCMAKE_BUILD_TYPE=Release
+        cmake --build build -j$(nproc)
+        
+    - uses: actions/upload-artifact@v4
+      with:
+        name: libFirstPersonModel
+        path: build/libFirstPersonModel.so
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+        contents: write
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Prepare release files
+      run: |
+        mkdir -p release/libs/arm64-v8a
+        mkdir -p release/assets
+        
+        cp artifacts/libFirstPersonModel/libFirstPersonModel.so release/libs/arm64-v8a/
+        
+        cat > release/manifest.json << 'EOF'
+        {
+          "format_version": 3,
+          "format": "manifest",
+          "id": "com.firstpersonmodel.mod",
+          "name": "FirstPersonModel",
+          "version": "${{ github.ref_name }}",
+          "description": "Shows the player model in first person view for Minecraft Bedrock",
+          "author": "FirstPersonModel Team",
+          "license": "MIT",
+          "type": "mod",
+          "client_only": true,
+          "platform": "android",
+          "arch": ["arm64-v8a"],
+          "min_api": 26,
+          "dependencies": {}
+        }
+        EOF
+        
+        cat > release/README.md << 'EOF'
+        # FirstPersonModel for LeviLaunchroid
+        
+        A client-side mod that shows your player model in first person view.
+        
+        ## Installation
+        1. Place the `libFirstPersonModel.so` file in your LeviLaunchroid mods directory
+        2. Launch Minecraft Bedrock through LeviLaunchroid
+        3. The mod will automatically activate
+        
+        ## Features
+        - Shows player model in first person view
+        - Camera offset adjustments
+        - Clientside only - no server modifications needed
+        
+        ## Compatibility
+        - Android 8.0+ (API 26+)
+        - ARM64 devices only
+        - Minecraft Bedrock 1.20+
+        EOF
+        
+        cd release && zip -r ../FirstPersonModel-${{ github.ref_name }}-android.zip .
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: FirstPersonModel-*.zip
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
