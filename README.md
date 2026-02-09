@@ -49,7 +49,7 @@ git clone https://github.com/FirstPersonModel/FirstPersonModel-LeviLaunchroid.gi
 cd FirstPersonModel-LeviLaunchroid
 
 # Navigate to the C++ source directory
-cd src
+cd src/main/cpp
 
 # Create build directory
 mkdir build && cd build
@@ -173,4 +173,3 @@ This mod requires a legitimate copy of Minecraft Bedrock Edition. We do not supp
 ---
 
 Made with ❤️ for the Minecraft Bedrock community
-# LeviLauncher-FirstPersonModel

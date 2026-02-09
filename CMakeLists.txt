@@ -40,21 +40,10 @@ target_link_libraries(preloader PUBLIC fmt::fmt)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/hook
 )
 
 set(SOURCES
-    src/FirstPersonModel.cpp
-    src/ModMain.cpp
-    src/CameraHooks.cpp
-    src/PlayerRenderer.cpp
-    hook/HookManager.cpp
-    hook/ARMPatch.cpp
-    hook/KittyMemory.cpp
-    hook/KittyUtils.cpp
-    hook/KittyScanner.cpp
-    hook/KittyArm64.cpp
+    src/main.cpp
 )
 
 add_library(FirstPersonModel SHARED ${SOURCES})
