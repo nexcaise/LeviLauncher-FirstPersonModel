@@ -23,7 +23,7 @@ float hook_OptionsgetFov(IOptions* opt, float df) {
         inited = true;
     }
 
-    return orig_OptionsgetFov ? orig_OptionsgetFov(opt, df) : nullptr;
+    return orig_OptionsgetFov(opt,df);// ? orig_OptionsgetFov(opt, df) : nullptr;
 }
 
 constexpr uintptr_t CAMERA_POS_OFFSET = 0x18;
@@ -97,7 +97,7 @@ static void FirstPersonModel_Init() {
         (void**)&orig_CameraRender
     );
     HOOK(
-        "FD 7B ? A9 F4 4F ? A9 FD 03 00 91 08 ?? 40 ? ? ? 00 ? ? 00 00 ? ? ? 00 94"
+        "FD 7B ? A9 F4 4F ? A9 FD 03 00 91 08 ?? 40 ? ? ? 00 ? ? 00 00 ? ? ? 00 94",
         (void*)hook_OptionsgetFov,
         (void**)&orig_OptionsgetFov
     );
