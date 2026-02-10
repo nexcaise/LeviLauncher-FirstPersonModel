@@ -76,7 +76,7 @@ static void* hook_CameraRender(void* camera, float deltaTime) {
         : nullptr;
 }
 
-static inline bool Hook(const char* sig, void* hook, void** orig) {
+static inline bool HOOK(const char* sig, void* hook, void** orig) {
     uintptr_t addr = pl::signature::pl_resolve_signature(sig, "libminecraftpe.so");
     if (!addr) return false;
 
@@ -91,7 +91,7 @@ static inline bool Hook(const char* sig, void* hook, void** orig) {
 __attribute__((constructor))
 static void FirstPersonModel_Init() {
     GlossInit(true);
-    Hook(
+    HOOK(
         "48 ? ? ? 21 ? ? 91 ? ? 00 ? ? 91 ? ? 40 ? ? 00 00 ? ? 00 94",
         (void*)hook_CameraRender,
         (void**)&orig_CameraRender
